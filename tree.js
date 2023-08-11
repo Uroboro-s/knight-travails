@@ -1,160 +1,86 @@
 import Node from "./node.js";
 
-
-    /* constructor(start, end) {
-        this.root = this.buildTree(start, [], end);
-    } */
-
-    //wrong approach since first buildtree() call will always be executed
-    //bfs is to be used for traversing 
-    // but exact bfs also cant be used
-    function buildTree(coordinates, arr = [], end) {
-        if(coordinates == end) return ;
-        if(coordinates[0] > 8  || coordinates[1] > 8)
-            return null;
-        if(coordinates[0] < 1 || coordinates[1] < 1)  
-            return null;
-
-        arr.push(coordinates);
-        
-        console.log(coordinates);
-        const root = new Node(coordinates);
-
-        let cor_arr = this.checkBounds(coordinates);
-
-        this.buildTree([coordinates[0] + 1, coordinates[1] + 2], arr, end);
-        this.buildTree([coordinates[0] + 1, coordinates[1] - 2], arr, end);
-        this.buildTree([coordinates[0] - 1, coordinates[1] + 2], arr, end);
-        this.buildTree([coordinates[0] - 1, coordinates[1] - 2], arr, end);
-        this.buildTree([coordinates[0] + 2, coordinates[1] + 1], arr, end);
-        this.buildTree([coordinates[0] + 2, coordinates[1] - 1], arr, end);
-        this.buildTree([coordinates[0] - 2, coordinates[1] + 1], arr, end);
-        this.buildTree([coordinates[0] - 2, coordinates[1] - 1], arr, end);
-
-        root.children.forEach(element => {
-            console.log("1");
-        });
-
+//calculates the shortest path for knight
+//returns the destination node which has predecessor node property that
+//is used to calculate path and number of moves
+function shortestPath(root, end, queue, arr = []) {
+    //to check for win condition
+    if(root.data[0] == end[0] && root.data[1] == end[1]) {
         return root;
     }
- /*    trialFunction() {
-        arr=[]
-        queue =[]
-        root(node)
-    } */
 
-/* levelOrder(arr = [], queue = [], root = this.root) {
-      if (root === null) return;
-      // Visit the root
-      arr.push(root.data);
-
-      // Traverse to left and right children -> add to queue
-      queue.push(root.left);
-      queue.push(root.right);
-
-      // Move to next level
-      while (queue.length) {
-        const level = queue[0];
-        queue.shift();
-        this.levelOrder(arr, queue, level)
-      }
-
-      return arr;
-    }*/
-function levelOrder(root, end, queue, arr = [], predecessor) {
-    if(root.data[0] == end[0] && root.data[1] == end[1]){
-
-        console.log("found");
-        console.log(root);
-        console.log(queue);
-        return root;
-    }
-    console.log(arr);
+    //to check for already visited coordinates
     for (let index = 0; index < arr.length; index++) {
-        console.log("huh");
         if(arr[index][0] == root.data[0] && arr[index][1] == root.data[1]) {
-            console.log("ha");
             return;
         }
     }
-
-    
-   arr.push(root.data);
   
+    arr.push(root.data);
 
-
-    
-    console.log(root);
-    let possible_children = checkBounds(root.data, root);
+    let possible_children = possibleChildren(root.data, root);
     root.children = possible_children;
-    console.log(possible_children);
-    //checks if added coordinates are successful and reutrns 
-    //the possible array
+    
+    //children nodes are enqueued in 'queue'
     for (let index = 0; index < root.children.length; index++) {
         queue.push(root.children[index]);
     }
-    console.log(queue);
+
     let endNode;
+    //calls the shortestPath() function on queue elements iteratively
+    //until queue is empty
     while(queue.length) {
-        endNode = levelOrder(queue[0], end, queue, arr, root);
+        endNode = shortestPath(queue[0], end, queue, arr, root);
         console.log(endNode);
         if(endNode !== undefined)
             if(endNode.data[0] == end[0] && endNode.data[1] == end[1])
                 queue = [];
-        console.log(queue);
-        queue.shift();
+        queue.shift();//updates the queue by removing the first element in queue 
     }
-    console.log("hier");
 
     return endNode;
 }
-let count = 0;
-function checkBounds(coordinates, predecessor) {
-    /* if(count == 10)
-    {
-        console.log("count reached = " + count);
-        return;
-    } */
+
+//checks if all added coordinates are possible or not  
+// and returns the possible array
+function possibleChildren(coordinates, predecessor) {
     let arr = [];
-    count++;
-        uildTree([coordinates[0] + 1, coordinates[1] + 2], arr, predecessor);
-        uildTree([coordinates[0] + 1, coordinates[1] - 2], arr, predecessor);
-        uildTree([coordinates[0] - 1, coordinates[1] + 2], arr, predecessor);
-        uildTree([coordinates[0] - 1, coordinates[1] - 2], arr, predecessor);
-        uildTree([coordinates[0] + 2, coordinates[1] + 1], arr, predecessor);
-        uildTree([coordinates[0] + 2, coordinates[1] - 1], arr, predecessor);
-        uildTree([coordinates[0] - 2, coordinates[1] + 1], arr, predecessor);
-        uildTree([coordinates[0] - 2, coordinates[1] - 1], arr, predecessor);
+        checkBounds([coordinates[0] + 1, coordinates[1] + 2], arr, predecessor);
+        checkBounds([coordinates[0] + 1, coordinates[1] - 2], arr, predecessor);
+        checkBounds([coordinates[0] - 1, coordinates[1] + 2], arr, predecessor);
+        checkBounds([coordinates[0] - 1, coordinates[1] - 2], arr, predecessor);
+        checkBounds([coordinates[0] + 2, coordinates[1] + 1], arr, predecessor);
+        checkBounds([coordinates[0] + 2, coordinates[1] - 1], arr, predecessor);
+        checkBounds([coordinates[0] - 2, coordinates[1] + 1], arr, predecessor);
+        checkBounds([coordinates[0] - 2, coordinates[1] - 1], arr, predecessor);
     console.log(arr);
     
     return arr;
 }
-function uildTree(coordinates, arr, predecessor)
-{
-    /* console.log(coordinates);
-    console.log(arr); */
 
+//checks for invalid moves made by knight
+function checkBounds(coordinates, arr, predecessor)
+{
     if(coordinates[0] > 8  || coordinates[1] > 8)
         return ;
     if(coordinates[0] < 1 || coordinates[1] < 1)  
         return ;
 
-    const newChild = new Node(coordinates, predecessor)
-    console.log(newChild);
+    const newChild = new Node(coordinates, predecessor);
     arr.push(newChild);
     return arr;
 }
 
-function intermmediateFunction(start, end) {
+//intermmediate function that calls for creation of starting node
+//and calls the shortestPath() function
+function knightMoves(start, end) {
     const root = new Node(start, undefined);
 
-    console.log(root);
     let destNode;
-    destNode = levelOrder(root, end, [],)
-    console.log(destNode);
+    destNode = shortestPath(root, end, [],)
     
+    return destNode;
 }
+
     
-
-
-export  default intermmediateFunction;
+export default knightMoves;
